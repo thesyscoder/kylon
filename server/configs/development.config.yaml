@@ -1,0 +1,36 @@
+# @File: develoment.configs.yaml
+# @Title: Application Configuration Settings
+# @Description: Defines various configuration parameters for the Nivak application,
+# @Description: including application, logging, database, Redis, authentication, and feature flag settings.
+# @Author: thesyscoder (github.com/thesyscoder)
+
+app:
+    name: Nivak # Name of the application
+    version: 1.0.0 # Version of the application
+    host: 0.0.0.0 # HTTP server hot
+    readTimeout: 5s # HTTP server read timeout
+    writeTimeout: 10s # HTTP server write timeout
+    idleTimeout: 60s # HTTP server idle timeout
+    shutdownTimeout: 5s # Graceful shutdown timeout for the HTTP server
+
+logs:
+    level: debug # Logging level (e.g., debug, info, warn, error)
+    format: text # Logging format (e.g., text, json)
+
+database:
+    maxConnection: 10 # Maximum number of open connections to the database
+    maxIdleConnection: 5 # Maximum number of idle connections in the pool
+    connectionMaxLifetime: 5m # Maximum amount of time a connection may be reused
+
+redis:
+    poolSize: 10 # Maximum number of connections in the Redis connection pool
+    readTimeout: 3s # Read timeout for Redis operations
+    writeTimeout: 3s # Write timeout for Redis operations
+
+auth:
+    accessTokenExp: 15m # Access Token expiration duration (e.g., 15 minutes)
+    refreshTokenExp: 168h # Refresh Token expiration duration (e.g., 7 days)
+
+featureFlags:
+    enableRealtimeUpdates: true # Controls whether real-time updates are enabled
+    enableAdminDashboard: false # Controls whether the admin dashboard is enabled
