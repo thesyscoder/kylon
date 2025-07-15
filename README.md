@@ -49,10 +49,10 @@ Kylon follows a clear separation of concerns, designed with multi-cluster and mu
 
 ```mermaid
 graph TD
-    A[Next.js Frontend] -- HTTP/gRPC --> B(Golang Backend API)
-    B -- Manages Kubeconfigs, Connects Dynamically --> C1[Kubernetes Cluster 1 (Cloud A)]
-    B -- Manages Kubeconfigs, Connects Dynamically --> C2[Kubernetes Cluster 2 (Cloud B)]
-    B -- Storage APIs (AWS, Azure, GCP SDKs) --> D[Cloud Object Storage (S3, Azure Blob, GCS)]
-    B -- AI Inference --> E(AI/ML Model)
-    F[Historical Data / Logs] -- Training --> E
+    A[🚀 Next.js Frontend] -- HTTP/gRPC --> B(⚙️ Golang Backend API)
+    B -- Manages Kubeconfigs, Connects Dynamically --> C1[☁️ Kubernetes Cluster 1 (Cloud A)]
+    B -- Manages Kubeconfigs, Connects Dynamically --> C2[☁️ Kubernetes Cluster 2 (Cloud B)]
+    B -- Storage APIs (AWS, Azure, GCP SDKs) --> D[💾 Cloud Object Storage (Multi-Cloud)]
+    B -- AI Inference --> E(🧠 AI/ML Model)
+    F[📜 Historical Data / Logs] -- Training --> E
 ```
