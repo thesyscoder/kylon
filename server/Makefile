@@ -19,21 +19,21 @@ all: run
 
 # run: Starts the application using CompileDaemon for automatic recompilation and restart
 # on code changes. Ideal for development.
-# It sources environment variables from kylon_config.env and pipes output through jq for colorful logs.
+# It sources environment variables from .env and pipes JSON log output through 'jq' for colorization.
 .PHONY: run
 run: build # Ensure the binary is built before running CompileDaemon
 	@echo "🚀 Starting Kylon Backend with auto-reload and colorful logs..."
-	# Check if kylon_config.env exists and load environment variables from it.
-	# This makes sure settings like MinIO credentials are available to the Go app.
+	# Check if .env exists and load environment variables from it.
+	# This makes sure settings like database credentials or MinIO are available to the Go app.
 	@if [ -f .env ]; then \
 		echo "Loading environment variables from .env..."; \
 		export $(grep -v '^#' .env | xargs); \
 	fi
 	# CompileDaemon watches for file changes, rebuilds, and restarts the command.
-	# The command itself pipes its stderr (where logrus writes) to stdout, then to jq for colorization.
+	# The command pipes its combined stdout/stderr to 'jq -C .' for JSON formatting and forced colorization.
 	CompileDaemon \
 		-build="go build -o $(BUILD_DIR)/$(BINARY_NAME) $(CMD_PATH)" \
-		-command="$(BUILD_DIR)/$(BINARY_NAME) 2>&1 | jq ." \
+		-command="$(BUILD_DIR)/$(BINARY_NAME) 2>&1 | jq -C ." \
 		-directory="." \
 		-include=".*\.go" \
 		-exclude=".git" \
@@ -48,7 +48,7 @@ build:
 	go build -o $(BUILD_DIR)/$(BINARY_NAME) $(CMD_PATH)
 
 # start: Runs the pre-built application binary manually.
-# It sources the kylon_config.env file and pipes output through jq for colorful logs.
+# It sources the .env file and pipes JSON log output through 'jq' for colorization.
 .PHONY: start
 start: build # Ensure the binary is built before running
 	@echo "🟢 Running $(BINARY_NAME) manually..."
@@ -57,8 +57,8 @@ start: build # Ensure the binary is built before running
 		echo "Loading environment variables from .env..."; \
 		export $(grep -v '^#' .env | xargs); \
 	fi
-	# Execute the binary and pipe its output through jq for colorization
-	$(BUILD_DIR)/$(BINARY_NAME) 2>&1 | jq .
+	# Execute the binary and pipe its output (combined stdout/stderr) through 'jq -C .' for colorization.
+	$(BUILD_DIR)/$(BINARY_NAME) 2>&1 | jq -C .
 
 # test: Executes all Go tests in the project.
 .PHONY: test

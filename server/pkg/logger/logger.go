@@ -20,14 +20,16 @@ func init() {
 	// Sets the default logging level to Info, meaning logs at Info, Warn, Error, Fatal, and Panic levels will be output.
 	log.SetLevel(logrus.InfoLevel)
 	// Configures the formatter to produce human-readable text output with full timestamps.
-	log.SetFormatter(&logrus.JSONFormatter{})
+	log.SetFormatter(&logrus.JSONFormatter{
+		PrettyPrint: true,
+	})
 	// Enables reporting of the file and line number where the log call originated, aiding in debugging.
 	log.SetReportCaller(true)
 	// Directs logger output to the standard logger's output, which is typically os.Stderr by default.
 	log.SetOutput(logrus.StandardLogger().Out)
 
 	// Logs an initial message to confirm logger setup, including a service identifier for context.
-	log.WithFields(logrus.Fields{"service": "nivak"}).Info("Logger initialized with default settings")
+	log.WithFields(logrus.Fields{"service": "kylon"}).Info("Logger initialized with default settings")
 }
 
 // GetLogger returns the global singleton Logrus logger instance.
