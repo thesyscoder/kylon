@@ -1,5 +1,5 @@
 /**
- * @File: errors.pkg.go
+ * @File: customerrors.go
  * @Title: Custom Application Error Type
  * @Description: Defines a flexible custom error type (`CustomError`) for application-specific
  * @Description: errors, supporting error wrapping for detailed cause tracking.
@@ -78,4 +78,6 @@ const (
 	ErrCodeExternalServiceError = "EXTERNAL_SERVICE_ERROR"
 	// ErrCodeInternal represents a generic, unexpected internal error.
 	ErrCodeInternal = "INTERNAL_ERROR"
+	// ErrCodeK8sClientNotInitialized indicates that the Kubernetes client was requested before being initialized.
+	ErrCodeK8sClientNotInitialized = "K8S_CLIENT_NOT_INITIALIZED" // Added this new error code
 )
