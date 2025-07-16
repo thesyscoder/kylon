@@ -7,7 +7,6 @@
 app:
     name: Nivak # Name of the application
     version: 1.0.0 # Version of the application
-    host: 0.0.0.0 # HTTP server hot
     readTimeout: 5s # HTTP server read timeout
     writeTimeout: 10s # HTTP server write timeout
     idleTimeout: 60s # HTTP server idle timeout
