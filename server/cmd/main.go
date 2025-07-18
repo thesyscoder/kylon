@@ -10,14 +10,14 @@
 package main
 
 import (
-	"context" // For context.Background() when making API calls
+	// For context.Background() when making API calls
 	"fmt"
 	"os"
 
 	"github.com/thesyscoder/kylon/internal/infrastructure/config"
 	"github.com/thesyscoder/kylon/internal/infrastructure/kubernetes"
 	"github.com/thesyscoder/kylon/pkg/logger"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1" // For metav1.ListOptions{}
+	// For metav1.ListOptions{}
 )
 
 func main() {
@@ -50,25 +50,6 @@ func main() {
 	// --- Step 4: Example Kubernetes API Interaction (Optional) ---
 	// This block demonstrates how to use the initialized Kubernetes client
 	// to list nodes. It also serves as a basic connectivity test.
-	kubeClient, err := kubernetes.GetKubernetesClient()
-	if err != nil {
-		// This error should ideally not happen if InitKubernetesClient succeeded,
-		// but it's good practice to check.
-		log.WithError(err).Error("Failed to retrieve Kubernetes client instance after successful initialization.")
-		os.Exit(1) // Treat as fatal if client unexpectedly unavailable.
-	}
-
-	nodes, err := kubeClient.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{})
-	if err != nil {
-		// Log a warning if node listing fails. This might be expected in dev environments
-		// without a running Kubernetes cluster or with limited RBAC permissions.
-		log.WithError(err).Warn("Could not list Kubernetes nodes (this might be expected if no cluster is configured locally or permissions are missing).")
-	} else {
-		log.Infof("Successfully listed %d Kubernetes nodes.", len(nodes.Items))
-		for _, node := range nodes.Items {
-			log.Debugf("Found node: %s", node.Name)
-		}
-	}
 
 	// --- Step 5: Application Startup (Placeholder) ---
 	// In a real application, you would start your HTTP server, message queues,
