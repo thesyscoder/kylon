@@ -47,17 +47,27 @@ func main() {
 	}
 	log.Info("Kubernetes client initialized successfully.")
 
-	// --- Step 4: Example Kubernetes API Interaction (Optional) ---
+	// --- Step 4:  Kubernetes API Interaction (Optional) ---
 	// This block demonstrates how to use the initialized Kubernetes client
 	// to list nodes. It also serves as a basic connectivity test.
-
+	kubeClient, err := kubernetes.GetKubernetesClient()
+	if err != nil {
+		// This error should ideally not happen if InitKubernetesClient succeeded,
+		// but it's good practice to check.
+		log.WithError(err).Error("Failed to retrieve Kubernetes client instance after successful initialization.")
+		os.Exit(1) // Treat as fatal if client unexpectedly unavailable.
+	}
 	// --- Step 5: Application Startup (Placeholder) ---
 	// In a real application, you would start your HTTP server, message queues,
 	// background workers, etc., here.
 	log.Info("Kylon Backend Server: Application is ready. (Placeholder for server startup)")
+	// Instantiate our custom server, injecting dependencies (config, db).
+	// 'db' might be nil if the connection failed, which the server and handlers must handle.
+	appServer := NewServer(cfg, nil, kubeClient)
 
-	// Keep the main goroutine alive, e.g., by starting an HTTP server
-	// For demonstration, we'll just print a message and exit.
-	// In a real application, this would be replaced by server.ListenAndServe() or similar.
-	// select {} // Uncomment to keep the application running indefinitely
+	// --- 5. Start Server ---
+	// Start the HTTP server and block until a shutdown signal is received.
+	// The server will now start even if the database connection failed, allowing the health endpoint to respond.
+	appServer.Start()
+
 }
