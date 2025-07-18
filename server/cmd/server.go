@@ -21,6 +21,7 @@ import (
 	"github.com/thesyscoder/kylon/internal/app/routes"
 	"github.com/thesyscoder/kylon/internal/infrastructure/config"
 	"gorm.io/gorm"
+	"k8s.io/client-go/kubernetes"
 )
 
 // Server encapsulates the Gin engine and application configuration.
@@ -31,11 +32,11 @@ type Server struct {
 }
 
 // NewServer creates and returns a new Server instance.
-func NewServer(cfg *config.Config, db *gorm.DB) *Server {
+func NewServer(cfg *config.Config, db *gorm.DB, kubeClient *kubernetes.Clientset) *Server {
 	gin.SetMode(gin.ReleaseMode)
 
 	// SetupRouter returns a configured *gin.Engine
-	router := routes.InitializeRoutes()
+	router := routes.InitializeRoutes(cfg, db, kubeClient)
 
 	return &Server{
 		Gin: router,
