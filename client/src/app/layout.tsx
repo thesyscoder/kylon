@@ -4,6 +4,7 @@ import { ToastProvider } from "@/contexts";
 import "../styles/globals.scss";
 import type { Metadata } from "next";
 import { Manrope, Edu_NSW_ACT_Foundation } from "next/font/google";
+import ReactQueryProvider from "@/contexts/query/query.contexts";
 
 const manrope = Manrope({
     subsets: ["latin"],
@@ -65,7 +66,9 @@ export default function RootLayout({
         <html lang="en" className={`${manrope.variable} ${eduHand.variable}`}>
             <body className="font-manrope">
                 <div className="main-content-wrapper">
-                    <ToastProvider>{children}</ToastProvider>
+                    <ReactQueryProvider>
+                        <ToastProvider>{children}</ToastProvider>
+                    </ReactQueryProvider>
                 </div>
             </body>
         </html>
