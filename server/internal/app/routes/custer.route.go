@@ -5,12 +5,11 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/thesyscoder/kylon/internal/app/handlers"
 	"github.com/thesyscoder/kylon/internal/app/services"
-	"github.com/thesyscoder/kylon/internal/infrastructure/config"
 	"github.com/thesyscoder/kylon/internal/infrastructure/repositories"
 	"gorm.io/gorm"
 )
 
-func RegisterClusterRoutes(rg *gin.RouterGroup, cfg *config.Config, db *gorm.DB, log *logrus.Logger) {
+func RegisterClusterRoutes(rg *gin.RouterGroup, db *gorm.DB, log *logrus.Logger) {
 	clusters := rg.Group("/clusters")
 	{
 		// call the dependecies
@@ -19,6 +18,9 @@ func RegisterClusterRoutes(rg *gin.RouterGroup, cfg *config.Config, db *gorm.DB,
 		clusterHandler := handlers.NewClusterHandler(clusterService, log)
 
 		clusters.POST("", clusterHandler.RegisterCluster)
+		clusters.GET("", clusterHandler.ListClusters) // e.g., GET /api/v1/clusters
+
+		log.Info("Cluster API routes registered successfully: /api/v1/clusters (POST, GET)")
 
 	}
 }

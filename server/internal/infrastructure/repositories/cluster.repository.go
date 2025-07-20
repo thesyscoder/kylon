@@ -21,6 +21,7 @@ import (
 // ClusterRepository defines operations for cluster data.
 type ClusterRepository interface {
 	Create(ctx context.Context, cluster *models.Cluster) error
+	List(ctx context.Context) ([]models.Cluster, error)
 }
 
 // postgresClusterRepository is a PostgreSQL implementation of ClusterRepository.
@@ -54,4 +55,25 @@ func (r *postgresClusterRepository) Create(ctx context.Context, cluster *models.
 
 	r.log.WithField("cluster_id", cluster.ID).Info("Successfully created cluster record.")
 	return nil
+}
+
+// List retrieves all Cluster models from the database.
+func (r *postgresClusterRepository) List(ctx context.Context) ([]models.Cluster, error) {
+	r.log.WithContext(ctx).Info("Attempting to retrieve all cluster records.")
+
+	var clusters []models.Cluster
+	if err := r.DB.WithContext(ctx).Find(&clusters).Error; err != nil {
+		r.log.WithContext(ctx).WithError(err).Error("Failed to retrieve cluster records from database.")
+		// Handle specific GORM errors if necessary, e.g., gorm.ErrRecordNotFound
+		return nil, customerrors.NewCustomError(
+			customerrors.ErrCodeDatabaseOperationFailed,
+			"Failed to retrieve clusters.",
+			err, // Pass the original error
+			http.StatusInternalServerError,
+			nil,
+		)
+	}
+
+	r.log.WithContext(ctx).Infof("Successfully retrieved %d cluster records.", len(clusters))
+	return clusters, nil
 }

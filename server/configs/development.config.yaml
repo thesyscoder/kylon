@@ -29,6 +29,7 @@ storage:
 
 kubernetes:
     kubeconfigPath: "" # Leave empty for in-cluster or default ~/.kube/config
+    kubeconfigSaveDir: ./data/kubeconfigs
 
 ai:
     enabled: false

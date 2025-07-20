@@ -1,10 +1,4 @@
-/**
- * @File: cluster_service.go
- * @Title: Cluster Service
- * @Description: Provides business logic for managing Cluster entities,
- * @Description: including registration and validation.
- */
-
+// services/cluster_service.go
 package services
 
 import (
@@ -20,7 +14,9 @@ import (
 
 // ClusterService defines the interface for cluster-related business operations.
 type ClusterService interface {
-	RegisterCluster(ctx context.Context, name, kubeconfig string) (*models.Cluster, error)
+	// Kubeconfig parameter now represents the *content* of the kubeconfig file, not its path.
+	RegisterCluster(ctx context.Context, name, kubeconfigContent string) (*models.Cluster, error)
+	ListClusters(ctx context.Context) ([]models.Cluster, error)
 }
 
 // ClusterServiceImpl provides the implementation of ClusterService.
@@ -31,6 +27,9 @@ type ClusterServiceImpl struct {
 
 // NewClusterService creates a new ClusterServiceImpl.
 func NewClusterService(clusterRepo repositories.ClusterRepository, log *logrus.Logger) ClusterService {
+	if clusterRepo == nil {
+		log.Fatal("ClusterRepository is nil when creating ClusterService. This indicates a critical setup error.")
+	}
 	return &ClusterServiceImpl{
 		clusterRepo: clusterRepo,
 		log:         log,
@@ -38,31 +37,48 @@ func NewClusterService(clusterRepo repositories.ClusterRepository, log *logrus.L
 }
 
 // RegisterCluster validates input and creates a new cluster record.
-func (s *ClusterServiceImpl) RegisterCluster(ctx context.Context, name, kubeconfig string) (*models.Cluster, error) {
-	s.log.WithField("cluster_name", name).Info("Attempting to register new cluster.")
+// kubeconfigContent is the actual content read from the uploaded file.
+func (s *ClusterServiceImpl) RegisterCluster(ctx context.Context, name, kubeconfigContent string) (*models.Cluster, error) {
+	s.log.WithContext(ctx).WithField("cluster_name", name).Info("Attempting to register new cluster with uploaded kubeconfig.")
 
-	if strings.TrimSpace(name) == "" || strings.TrimSpace(kubeconfig) == "" {
-		s.log.Warn("Invalid cluster registration input: name or kubeconfig is empty.")
+	// Input validation for name and kubeconfig content
+	if strings.TrimSpace(name) == "" || strings.TrimSpace(kubeconfigContent) == "" {
+		s.log.WithContext(ctx).Warn("Invalid cluster registration input: name or kubeconfig content is empty.")
 		return nil, customerrors.NewCustomError(
 			customerrors.ErrCodeInvalidInput,
-			"Cluster name and kubeconfig are required.",
-			nil,
+			"Cluster name and kubeconfig content are required.",
+			nil, // No underlying error
 			http.StatusBadRequest,
 			nil,
 		)
 	}
 
+	// Create the domain model
 	cluster := &models.Cluster{
-		Name:       name,
-		Kubeconfig: kubeconfig,
+		Name: name,
+		// Assign the content to the Kubeconfig field in the model
+		Kubeconfig: kubeconfigContent, // Assuming models.Cluster has Kubeconfig string
 	}
 
 	if err := s.clusterRepo.Create(ctx, cluster); err != nil {
-		s.log.WithError(err).Error("Failed to persist cluster via repository.")
-		// The error returned from the repository is already a custom error.
+		s.log.WithContext(ctx).WithError(err).Error("Failed to persist cluster via repository.")
 		return nil, err
 	}
 
-	s.log.WithField("cluster_id", cluster.ID).Info("Cluster registered successfully.")
+	s.log.WithContext(ctx).WithField("cluster_id", cluster.ID).Info("Cluster registered successfully.")
 	return cluster, nil
+}
+
+// ListClusters remains unchanged as its logic does not depend on file upload.
+func (s *ClusterServiceImpl) ListClusters(ctx context.Context) ([]models.Cluster, error) {
+	s.log.WithContext(ctx).Info("Attempting to list all clusters.")
+
+	clusters, err := s.clusterRepo.List(ctx)
+	if err != nil {
+		s.log.WithContext(ctx).WithError(err).Error("Failed to retrieve clusters from repository.")
+		return nil, err
+	}
+
+	s.log.WithContext(ctx).Infof("Successfully retrieved %d clusters.", len(clusters))
+	return clusters, nil
 }

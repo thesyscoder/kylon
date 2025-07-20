@@ -18,6 +18,6 @@ func InitializeRoutes(cfg *config.Config, db *gorm.DB, log *logrus.Logger, kubeC
 		apiV1.GET("healthz", handlers.SetupHealthCheckHandler())
 	}
 	// Clusters (call RegisterClusterRoutes)
-	RegisterClusterRoutes(apiV1, cfg, db, log)
+	RegisterClusterRoutes(apiV1, db, log)
 	return router
 }
