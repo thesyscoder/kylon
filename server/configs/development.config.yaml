@@ -18,12 +18,18 @@ logs:
     level: debug
     format: json # or text
 
+database:
+    maxConnection: 10
+    maxIdleConnection: 5
+    connectionMaxLifetime: 5m
+
 storage:
     provider: minio
     bucket: kylon-dev-backups
 
 kubernetes:
     kubeconfigPath: "" # Leave empty for in-cluster or default ~/.kube/config
+    kubeconfigSaveDir: ./data/kubeconfigs
 
 ai:
     enabled: false
