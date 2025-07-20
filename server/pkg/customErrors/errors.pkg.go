@@ -2,15 +2,15 @@
  * @File: customerrors.go
  * @Title: Custom Application Error Type
  * @Description: Defines a flexible custom error type (`CustomError`) for application-specific
- * @Description: errors, supporting error wrapping for detailed cause tracking, and including
- * @Description: fields suitable for direct API response mapping.
+ * errors, supporting error wrapping for detailed cause tracking, and including
+ * fields suitable for direct API response mapping.
  * @Author: thesyscoder (github.com/thesyscoder)
  */
 
 package customerrors
 
 import (
-	"errors" // Standard library for error handling utilities
+	"errors"
 	"fmt"
 )
 
@@ -22,12 +22,11 @@ type CustomError struct {
 	Code       string `json:"code"`           // Unique application-specific error code (e.g., "CONFIG_LOAD_FAILED")
 	Message    string `json:"message"`        // Human-readable message describing the error
 	Err        error  `json:"-"`              // The underlying error, omitted from JSON marshaling
-	HTTPStatus int    `json:"-"`              // HTTP status code appropriate for this error, omitted from JSON
+	HTTPStatus int    `json:"-"`              // HTTP status code for this error, omitted from JSON
 	Data       any    `json:"data,omitempty"` // Additional error-specific data for the API response
 }
 
-// Error implements the `error` interface for CustomError.
-// It returns a formatted string representation of the error.
+// Error implements the error interface for CustomError.
 func (e *CustomError) Error() string {
 	if e.Err != nil {
 		return fmt.Sprintf("code: %s, message: %s, underlying_error: %v", e.Code, e.Message, e.Err)
@@ -35,19 +34,13 @@ func (e *CustomError) Error() string {
 	return fmt.Sprintf("code: %s, message: %s", e.Code, e.Message)
 }
 
-// Unwrap implements the `errors.Unwrap` interface for CustomError.
-// This allows `errors.Is` and `errors.As` to be used for inspecting the error chain.
+// Unwrap allows error unwrapping for errors.Is/errors.As.
 func (e *CustomError) Unwrap() error {
 	return e.Err
 }
 
-// NewCustomError creates and returns a new CustomError instance.
-// `code` is the application-specific error code (e.g., "INVALID_INPUT").
-// `message` is a human-readable description.
-// `err` is an optional underlying error to wrap.
-// `httpStatus` is the HTTP status code to be returned in API responses.
-// `data` is optional additional data relevant to the error.
-func NewCustomError(code, message string, err error, httpStatus int, data any) *CustomError {
+// NewCustomError returns a new instance of CustomError.
+func NewCustomError(code, message string, err error, httpStatus int, data interface{}) *CustomError {
 	return &CustomError{
 		Code:       code,
 		Message:    message,
@@ -57,36 +50,62 @@ func NewCustomError(code, message string, err error, httpStatus int, data any) *
 	}
 }
 
-// IsCustomError checks if the given error is of type *CustomError.
-// This is useful for type assertion and specific error handling, even if wrapped.
+// IsCustomError checks if the given error is a *CustomError, even if wrapped.
 func IsCustomError(err error) bool {
 	var ce *CustomError
 	return errors.As(err, &ce)
 }
 
+// APPLICATION ERROR CODES (expand as needed for your domain)
 const (
-	// ErrCodeConfigLoadFailed indicates an error occurred while loading application configuration.
-	ErrCodeConfigLoadFailed = "CONFIG_LOAD_FAILED"
-	// ErrCodeK8sClientInitFailed indicates a failure to initialize the Kubernetes client.
-	ErrCodeK8sClientInitFailed = "K8S_CLIENT_INIT_FAILED"
-	// ErrCodeK8sClientNotInitialized indicates that the Kubernetes client was requested before being initialized.
-	ErrCodeK8sClientNotInitialized = "K8S_CLIENT_NOT_INITIALIZED"
-	// ErrCodeStorageInitFailed indicates a failure to initialize storage (e.g., database, file system).
-	ErrCodeStorageInitFailed = "STORAGE_INIT_FAILED"
-	// ErrCodeInvalidInput indicates that input provided to a function or method was invalid.
-	ErrCodeInvalidInput = "INVALID_INPUT"
-	// ErrCodeResourceNotFound indicates that a requested resource could not be found.
-	ErrCodeResourceNotFound = "RESOURCE_NOT_FOUND"
-	// ErrCodeAlreadyExists indicates an attempt to create a resource that already exists.
-	ErrCodeAlreadyExists = "RESOURCE_ALREADY_EXISTS"
-	// ErrCodeDatabaseOperationFailed indicates a generic failure during a database operation.
-	ErrCodeDatabaseOperationFailed = "DATABASE_OPERATION_FAILED"
-	// ErrCodeUnauthorized indicates an authentication failure (e.g., invalid credentials, missing token).
-	ErrCodeUnauthorized = "UNAUTHORIZED"
-	// ErrCodePermissionDenied indicates an authorization failure (user lacks required permissions).
-	ErrCodePermissionDenied = "PERMISSION_DENIED"
-	// ErrCodeExternalServiceError indicates an error from an external dependency.
+	// Configuration & Startup
+	ErrCodeConfigLoadFailed       = "CONFIG_LOAD_FAILED"
+	ErrCodeConfigValidationFailed = "CONFIG_VALIDATION_FAILED"
+	ErrCodeEnvMissingRequired     = "ENV_MISSING_REQUIRED"
+	ErrCodeSecretLoadFailed       = "SECRET_LOAD_FAILED"
+
+	// Database/Storage
+	ErrCodeStorageInitFailed        = "STORAGE_INIT_FAILED"
+	ErrCodeDatabaseConnectionFailed = "DATABASE_CONNECTION_FAILED"
+	ErrCodeDatabaseOperationFailed  = "DATABASE_OPERATION_FAILED"
+	ErrCodeMigrationFailed          = "MIGRATION_FAILED"
+	ErrCodeTransactionFailed        = "TRANSACTION_FAILED"
+
+	// Kubernetes/Cloud APIs
+	ErrCodeK8sClientInitFailed      = "K8S_CLIENT_INIT_FAILED"
+	ErrCodeK8sClientNotInitialized  = "K8S_CLIENT_NOT_INITIALIZED"
+	ErrCodeK8sResourceError         = "K8S_RESOURCE_ERROR"
+	ErrCodeK8sAPIError              = "K8S_API_ERROR"
+	ErrCodeCloudProviderError       = "CLOUD_PROVIDER_ERROR"
+	ErrCodeObjectStorageUnavailable = "OBJECT_STORAGE_UNAVAILABLE"
+
+	// Application/Business Logic
+	ErrCodeInvalidInput        = "INVALID_INPUT"
+	ErrCodeResourceNotFound    = "RESOURCE_NOT_FOUND"
+	ErrCodeAlreadyExists       = "RESOURCE_ALREADY_EXISTS"
+	ErrCodePermissionDenied    = "PERMISSION_DENIED"
+	ErrCodeUnauthorized        = "UNAUTHORIZED"
+	ErrCodeRateLimitExceeded   = "RATE_LIMIT_EXCEEDED"
+	ErrCodeOperationTimeout    = "OPERATION_TIMEOUT"
+	ErrCodeOperationInProgress = "OPERATION_IN_PROGRESS"
+	ErrCodeDependencyFailed    = "DEPENDENCY_FAILED"
+	ErrCodeBackupFailed        = "BACKUP_FAILED"
+	ErrCodeRestoreFailed       = "RESTORE_FAILED"
+	ErrCodeSnapshotFailed      = "SNAPSHOT_FAILED"
+	ErrCodeValidationFailed    = "VALIDATION_FAILED"
+
+	// External Services / Dependencies
 	ErrCodeExternalServiceError = "EXTERNAL_SERVICE_ERROR"
-	// ErrCodeInternal represents a generic, unexpected internal error.
-	ErrCodeInternal = "INTERNAL_ERROR"
+	ErrCodeIntegrationFailed    = "INTEGRATION_FAILED"
+	ErrCodeWebhookFailed        = "WEBHOOK_FAILED"
+	ErrCodeNotificationFailed   = "NOTIFICATION_FAILED"
+	ErrCodeThirdPartyAPIError   = "THIRD_PARTY_API_ERROR"
+	ErrCodeAuthProviderError    = "AUTH_PROVIDER_ERROR"
+
+	// System/Infrastructure
+	ErrCodeInternal            = "INTERNAL_ERROR"
+	ErrCodeNotImplemented      = "NOT_IMPLEMENTED"
+	ErrCodeUnavailable         = "UNAVAILABLE"
+	ErrCodeMaintenanceMode     = "MAINTENANCE_MODE"
+	ErrCodeServiceShuttingDown = "SERVICE_SHUTTING_DOWN"
 )

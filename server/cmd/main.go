@@ -10,16 +10,16 @@
 package main
 
 import (
-	// For context.Background() when making API calls
 	"fmt"
 	"os"
 
+	"github.com/thesyscoder/kylon/internal/domain/models"
 	"github.com/thesyscoder/kylon/internal/infrastructure/config"
 	"github.com/thesyscoder/kylon/internal/infrastructure/database"
 	"github.com/thesyscoder/kylon/internal/infrastructure/kubernetes"
 	"github.com/thesyscoder/kylon/pkg/logger"
 	"gorm.io/gorm"
-	// For metav1.ListOptions{}
+	k8sClient "k8s.io/client-go/kubernetes" // Added k8s.io/client-go/kubernetes alias
 )
 
 func main() {
@@ -34,62 +34,62 @@ func main() {
 
 	// --- Step 2: Initialize Logger based on Config ---
 	// The custom logger's level is set based on the loaded configuration.
+	// Ensure logger.SetLogger exists and correctly configures logrus.
 	logger.SetLogger(cfg.Log.Level)
-	log := logger.GetLogger()
+	log := logger.GetLogger() // This 'log' is your configured *logrus.Logger
 	log.Info("Kylon Backend Server: Starting up...")
 
-	var db *gorm.DB            // Declare db variable
-	dbConnectErr := error(nil) // Declare an error variable for DB connection
-
-	db, dbConnectErr = database.ConnectPostgres(cfg)
-	if dbConnectErr != nil {
-		log.Printf("[Main]: Failed to connect to database: %v. The health endpoint will report this.", dbConnectErr)
-		// db will be nil here, which is handled by the HealthHandler.
+	var db *gorm.DB
+	// --- Step 3: Connect to Database ---
+	// Database connection is attempted. The server will start even if it fails,
+	// allowing the health endpoint to report the DB status.
+	db, err = database.ConnectPostgres(cfg) // Use 'err' from the outer scope
+	if err != nil {
+		log.WithError(err).Warn("Failed to connect to database. The health endpoint will report this.")
+		db = nil // Ensure db is explicitly nil if connection fails
 	} else {
-		log.Println("[Main]: Database connection established successfully.")
+		log.Info("Database connection established successfully.")
 
-		// --- 3. Auto-Migrate Database schemas (ONLY if DB connection was successful) ---
-		// If DB connection failed, we cannot run migrations, and this is typically a fatal issue
-		// for the application's full functionality.
-		migrateErr := db.AutoMigrate()
+		// --- Auto-Migrate Database schemas (ONLY if DB connection was successful) ---
+		// If DB connection failed, migrations cannot run.
+		migrateErr := db.AutoMigrate(&models.Cluster{})
 		if migrateErr != nil {
-			log.Fatalf("[Database]: Failed to auto-migrate database: %v. Application cannot function without migrations.", migrateErr)
+			log.WithError(migrateErr).Fatal("Failed to auto-migrate database. Application cannot function without migrations.")
+			// os.Exit(1) is handled by Fatal, which calls os.Exit(1) by default
 		}
-		log.Println("[Database]: Database migrations completed successfully.")
+		log.Info("Database migrations completed successfully.")
 	}
 
-	// --- Step 3: Initialize Kubernetes Client ---
+	// --- Step 4: Initialize Kubernetes Client ---
 	// Initialize the Kubernetes client. This function handles both in-cluster and kubeconfig setups.
 	log.Info("Initializing Kubernetes client...")
-	err = kubernetes.InitKubernetesClient(*cfg)
-	if err != nil {
+	initKubeErr := kubernetes.InitKubernetesClient(*cfg)
+	if initKubeErr != nil {
 		// Log the error using the configured logger before exiting.
-		log.WithError(err).Error("Failed to initialize Kubernetes client. Exiting.")
-		os.Exit(1)
+		log.WithError(initKubeErr).Fatal("Failed to initialize Kubernetes client. Exiting.")
 	}
 	log.Info("Kubernetes client initialized successfully.")
 
-	// --- Step 4:  Kubernetes API Interaction (Optional) ---
-	// This block demonstrates how to use the initialized Kubernetes client
-	// to list nodes. It also serves as a basic connectivity test.
-	kubeClient, err := kubernetes.GetKubernetesClient()
+	// --- Step 5: Retrieve Kubernetes Client Instance ---
+	// Get the initialized Kubernetes client.
+	var kubeClient *k8sClient.Clientset // Declare with the correct type alias
+	kubeClient, err = kubernetes.GetKubernetesClient()
 	if err != nil {
 		// This error should ideally not happen if InitKubernetesClient succeeded,
 		// but it's good practice to check.
-		log.WithError(err).Error("Failed to retrieve Kubernetes client instance after successful initialization.")
-		os.Exit(1) // Treat as fatal if client unexpectedly unavailable.
+		log.WithError(err).Fatal("Failed to retrieve Kubernetes client instance after successful initialization. Exiting.")
 	}
-	// --- Step 5: Application Startup (Placeholder) ---
-	// In a real application, you would start your HTTP server, message queues,
-	// background workers, etc., here.
-	log.Infof("Starting Kylon backend in %s mode on port %s", cfg.App.Host, cfg.App.Port)
-	// Instantiate our custom server, injecting dependencies (config, db).
-	// 'db' might be nil if the connection failed, which the server and handlers must handle.
-	appServer := NewServer(cfg, nil, kubeClient)
+	// --- Step 6: Application Server Startup ---
+	log.Infof("Starting Kylon backend in %s mode on port %s", cfg.App.Env, cfg.App.Port) // Use App.Env for clarity
 
-	// --- 5. Start Server ---
+	// Instantiate our custom server, injecting dependencies.
+	// Pass the 'db' variable, which will be nil if the connection failed,
+	// or a valid *gorm.DB if successful.
+	appServer := NewServer(cfg, db, kubeClient, log) // Pass 'log' (logrus) instance
+
+	// --- Step 7: Start Server ---
 	// Start the HTTP server and block until a shutdown signal is received.
-	// The server will now start even if the database connection failed, allowing the health endpoint to respond.
+	// The server will now start even if the database connection failed,
+	// allowing the health endpoint to respond appropriately.
 	appServer.Start()
-
 }
