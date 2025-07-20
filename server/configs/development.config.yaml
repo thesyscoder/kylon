@@ -18,6 +18,11 @@ logs:
     level: debug
     format: json # or text
 
+database:
+    maxConnection: 10
+    maxIdleConnection: 5
+    connectionMaxLifetime: 5m
+
 storage:
     provider: minio
     bucket: kylon-dev-backups

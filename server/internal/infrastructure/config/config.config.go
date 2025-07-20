@@ -24,8 +24,9 @@ var log = logger.GetLogger().WithField("component", "config")
 
 // Config holds all application configurations, structured into logical sub-sections.
 type Config struct {
-	App        AppConfig        `yaml:"app"`
-	Log        LogConfig        `yaml:"logs"` // Corrected YAML key to "logs"
+	App        AppConfig `yaml:"app"`
+	Log        LogConfig `yaml:"logs"` // Corrected YAML key to "logs"
+	Database   Database
 	Storage    StorageConfig    `yaml:"storage"`
 	Kubernetes KubernetesConfig `yaml:"kubernetes"`
 	AI         AIConfig         `yaml:"ai"`
@@ -49,6 +50,19 @@ type AppConfig struct {
 type LogConfig struct {
 	Level  string `yaml:"level"`
 	Format string `yaml:"format"` // e.g., json or text
+}
+
+// Database holds database settings
+type Database struct {
+	Host                  string        `env:"DB_HOST" yaml:"host"`
+	Port                  string        `env:"DB_PORT" yaml:"port"`
+	User                  string        `env:"DB_USER" yaml:"user"`
+	Password              string        `env:"DB_PASSWORD" yaml:"password"`
+	Name                  string        `env:"DB_NAME" yaml:"name"`
+	SslMode               string        `env:"DB_SSL_MODE" yaml:"sslMode"`
+	MaxConnections        int           `yaml:"maxConnections"`
+	MaxIdleConnections    int           `yaml:"maxIdleConnections"`
+	ConnectionMaxLifetime time.Duration `yaml:"connectionMaxLifetime"`
 }
 
 // StorageConfig represents the backup storage provider and bucket info.
