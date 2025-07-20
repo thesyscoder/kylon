@@ -5,9 +5,11 @@ import (
 	"context"
 	"net/http"
 	"strings"
+	"time" // Keep time imported as it's used for formatting
 
 	"github.com/sirupsen/logrus"
 	"github.com/thesyscoder/kylon/internal/domain/models"
+	"github.com/thesyscoder/kylon/internal/domain/types" // IMPORTANT: Keep this import
 	"github.com/thesyscoder/kylon/internal/infrastructure/repositories"
 	customerrors "github.com/thesyscoder/kylon/pkg/customErrors"
 )
@@ -16,7 +18,8 @@ import (
 type ClusterService interface {
 	// Kubeconfig parameter now represents the *content* of the kubeconfig file, not its path.
 	RegisterCluster(ctx context.Context, name, kubeconfigContent string) (*models.Cluster, error)
-	ListClusters(ctx context.Context) ([]models.Cluster, error)
+	// <--- UPDATED: Interface method now returns []types.ClusterSummary
+	ListClusters(ctx context.Context) ([]types.ClusterSummary, error)
 }
 
 // ClusterServiceImpl provides the implementation of ClusterService.
@@ -46,9 +49,13 @@ func (s *ClusterServiceImpl) RegisterCluster(ctx context.Context, name, kubeconf
 		s.log.WithContext(ctx).Warn("Invalid cluster registration input: name or kubeconfig content is empty.")
 		return nil, customerrors.NewCustomError(
 			customerrors.ErrCodeInvalidInput,
+
 			"Cluster name and kubeconfig content are required.",
+
 			nil, // No underlying error
+
 			http.StatusBadRequest,
+
 			nil,
 		)
 	}
@@ -62,6 +69,8 @@ func (s *ClusterServiceImpl) RegisterCluster(ctx context.Context, name, kubeconf
 
 	if err := s.clusterRepo.Create(ctx, cluster); err != nil {
 		s.log.WithContext(ctx).WithError(err).Error("Failed to persist cluster via repository.")
+		// The error from repo should ideally already be a custom error.
+		// If not, wrap it into a relevant custom error.
 		return nil, err
 	}
 
@@ -69,16 +78,29 @@ func (s *ClusterServiceImpl) RegisterCluster(ctx context.Context, name, kubeconf
 	return cluster, nil
 }
 
-// ListClusters remains unchanged as its logic does not depend on file upload.
-func (s *ClusterServiceImpl) ListClusters(ctx context.Context) ([]models.Cluster, error) {
+// ListClusters retrieves all cluster records from the repository and converts them to summary DTOs.
+// <--- UPDATED: Implementation return type now matches the interface.
+func (s *ClusterServiceImpl) ListClusters(ctx context.Context) ([]types.ClusterSummary, error) {
 	s.log.WithContext(ctx).Info("Attempting to list all clusters.")
 
 	clusters, err := s.clusterRepo.List(ctx)
 	if err != nil {
 		s.log.WithContext(ctx).WithError(err).Error("Failed to retrieve clusters from repository.")
-		return nil, err
+		return nil, err // Assuming repository already returns custom errors, or wrap generic errors here.
 	}
 
-	s.log.WithContext(ctx).Infof("Successfully retrieved %d clusters.", len(clusters))
-	return clusters, nil
+	summaries := make([]types.ClusterSummary, len(clusters))
+	for i, cluster := range clusters {
+		summaries[i] = types.ClusterSummary{
+
+			ID:   cluster.ID.String(),
+			Name: cluster.Name,
+
+			CreatedAt: cluster.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: cluster.UpdatedAt.Format(time.RFC3339),
+		}
+	}
+
+	s.log.WithContext(ctx).Infof("Successfully retrieved %d clusters and converted to summaries.", len(summaries))
+	return summaries, nil
 }
