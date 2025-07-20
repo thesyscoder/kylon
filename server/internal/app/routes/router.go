@@ -14,7 +14,7 @@ func InitializeRoutes(cfg *config.Config, db *gorm.DB, kubeClient *kubernetes.Cl
 	router.Use(middleware.CorsMiddleware())
 	apiV1 := router.Group("/api/v1")
 	{
-		apiV1.GET("healthz", handlers.HealthCheckHandler(cfg, db, kubeClient))
+		apiV1.GET("healthz", handlers.SetupHealthCheckHandler())
 	}
 
 	return router
