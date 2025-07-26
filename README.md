@@ -18,7 +18,7 @@ Kylon’s mission is to enable **proactive data resilience** through intuitive i
 |--------------------|---------------------------------------------|
 | Monorepo Tooling   | [NX](https://nx.dev)                        |
 | Frontend/Backend   | [Next.js](https://nextjs.org)               |
-| API Layer          | [tRPC](https://trpc.io)                     |
+| API Layer          | [oRPC](https://orpc.unnoq.com/)                     |
 | Authentication     | [Supabase Auth](https://supabase.com/auth) |
 | Database           | PostgreSQL (via Supabase)                   |
 | State Management   | [Zustand](https://zustand-demo.pmnd.rs/)    |
@@ -64,7 +64,7 @@ Kylon follows a unified full-stack TypeScript architecture:
 
 ```mermaid
 graph TD
-    A["🧭 Next.js Frontend (React + SASS + Zustand)"] -->|tRPC| B["⚙️ Next.js Backend (API Routes + tRPC)"]
+    A["🧭 Next.js Frontend (React + SASS + Zustand)"] -->|tRPC| B["⚙️ Next.js Backend (API Routes + oRPC)"]
     B -->|Securely Stores| C1["📂 Supabase DB (PostgreSQL)"]
     B -->|Connects via Kubeconfig| C2["☸️ K8s Clusters"]
     B -->|Uploads/Fetches Snapshots| D["🪣 Object Storage (AWS/GCP/Azure)"]
