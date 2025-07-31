@@ -1,0 +1,81 @@
+// src/styles/base/_typography.scss
+@use "../abstracts/variables" as v;
+
+body {
+    font-family: v.$font-family-manrope, sans-serif;
+    font-size: v.$font-size-base;
+    line-height: 1.6;
+    color: v.$color-text-dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: v.$font-family-manrope, sans-serif;
+    color: v.$color-text-dark;
+    line-height: 1.2;
+    margin-top: v.$spacing-md;
+    margin-bottom: v.$spacing-sm;
+}
+
+h1 {
+    font-size: v.$font-size-h1;
+}
+
+h2 {
+    font-size: v.$font-size-h2;
+}
+
+h3 {
+    font-size: v.$font-size-h3;
+}
+
+h4 {
+    font-size: v.$font-size-xl;
+}
+
+h5 {
+    font-size: v.$font-size-lg;
+}
+
+h6 {
+    font-size: v.$font-size-base;
+}
+
+p {
+    margin-bottom: v.$spacing-sm;
+}
+
+a {
+    color: v.$color-primary;
+    text-decoration: underline;
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+b,
+strong {
+    font-weight: bold;
+}
+
+em,
+i {
+    font-style: italic;
+}
+
+small {
+    font-size: v.$font-size-sm;
+}
+
+code {
+    font-family: v.$font-family-mono;
+    background-color: #eee;
+    padding: v.$spacing-xxs v.$spacing-xs;
+    border-radius: 4px;
+}

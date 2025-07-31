@@ -1,0 +1,31 @@
+// src/styles/base/_base.scss
+@use "../abstracts/variables" as v;
+@use "./base/_reset.scss";
+@use "./base/typography";
+
+html {
+    // Base font size for rem calculations.
+    // 1rem will equal 16px if browser default is 16px.
+    font-size: 100%;
+}
+
+body {
+    background-color: v.$color-background-light;
+    min-height: 100vh; // Ensure body takes at least full viewport height
+    display: flex; // Allows main content to fill space
+    flex-direction: column;
+}
+
+// Anchor tags that are not explicitly styled otherwise
+a {
+    &:hover {
+        color: v.$color-secondary; // Darker blue on hover
+    }
+}
+
+// Basic focus outline for accessibility
+*:focus-visible {
+    outline: 2px solid v.$color-primary;
+    outline-offset: 2px;
+    border-radius: 4px; /* Optional: adds soft corners to outline */
+}
