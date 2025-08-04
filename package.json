@@ -1,36 +1,36 @@
 {
-    "name": "kylon",
-    "version": "0.1.0",
-    "private": true,
-    "scripts": {
-        "dev": "next dev --turbopack",
-        "build": "next build --turbopack",
-        "start": "next start",
-        "lint": "next lint"
-    },
-    "dependencies": {
-        "@supabase/supabase-js": "^2.52.1",
-        "@tanstack/react-query": "^5.83.0",
-        "clsx": "^2.1.1",
-        "dayjs": "^1.11.13",
-        "framer-motion": "^12.23.9",
-        "next": "15.4.4",
-        "orpc": "^0.1.1",
-        "react": "19.1.0",
-        "react-dom": "19.1.0",
-        "react-hot-toast": "^2.5.2",
-        "sass": "^1.89.2",
-        "upgrade": "^1.1.0",
-        "zod": "^4.0.10",
-        "zustand": "^5.0.6"
-    },
-    "devDependencies": {
-        "@eslint/eslintrc": "^3",
-        "@types/node": "^20",
-        "@types/react": "^19",
-        "@types/react-dom": "^19",
-        "eslint": "^9",
-        "eslint-config-next": "15.4.4",
-        "typescript": "^5"
-    }
+  "name": "kylon",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.53.0",
+    "@tanstack/react-query": "^5.84.1",
+    "@trpc/client": "^11.4.3",
+    "@trpc/next": "^11.4.3",
+    "@trpc/react-query": "^11.4.3",
+    "@trpc/server": "^11.4.3",
+    "framer-motion": "^12.23.12",
+    "next": "15.4.5",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-hot-toast": "^2.5.2",
+    "sass": "^1.89.2",
+    "zod": "^4.0.14",
+    "zustand": "^5.0.7"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.5",
+    "typescript": "^5"
+  }
 }

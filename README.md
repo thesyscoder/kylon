@@ -1,72 +1,36 @@
-# 🛡️ Kylon
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-**"Building Unbreakable Foundations for K8s Data."**
+## Getting Started
 
----
+First, run the development server:
 
-## 🚀 Project Overview
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-**Kylon** is an open-source platform focused on delivering intelligent, reliable, and secure Kubernetes backup and recovery. It leverages a modern, full-stack **TypeScript** architecture using **Next.js**, **tRPC**, **Supabase**, and **PostgreSQL**—designed for multi-cluster and multi-cloud environments.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Kylon’s mission is to enable **proactive data resilience** through intuitive interfaces, fine-grained control, and future-ready AI-powered insights for stateful and stateless Kubernetes workloads.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
----
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## 🧰 Tech Stack
+## Learn More
 
-| Layer              | Technology                                 |
-|--------------------|---------------------------------------------|
-| Monorepo Tooling   | [NX](https://nx.dev)                        |
-| Frontend/Backend   | [Next.js](https://nextjs.org)               |
-| API Layer          | [oRPC](https://orpc.unnoq.com/)                     |
-| Authentication     | [Supabase Auth](https://supabase.com/auth) |
-| Database           | PostgreSQL (via Supabase)                   |
-| State Management   | [Zustand](https://zustand-demo.pmnd.rs/)    |
-| Remote Data Sync   | [React Query](https://tanstack.com/query)  |
-| Styling/UX         | SASS, Framer Motion                         |
-| Hosting/Infra      | Supabase, Kubernetes, Object Storage (S3/GCS/etc.) |
+To learn more about Next.js, take a look at the following resources:
 
----
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## ✨ Key Features
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### ✅ Multi-Cluster Support
-- Manage `kubeconfig`s securely from one dashboard
-- Run scoped backups/restores across multiple Kubernetes clusters
+## Deploy on Vercel
 
-### ✅ Cloud-Agnostic Object Storage
-- Support for AWS S3, Azure Blob, GCP Storage, and other S3-compatible endpoints
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-### ✅ Stateless & Stateful K8s Backups
-- CRDs, Secrets, ConfigMaps, Deployments, Services, etc.
-- Persistent Volume snapshots using CSI
-- App-aware DB backups (via `kubectl exec`)
-
-### ✅ Unified Dashboard
-- Real-time dashboards for operations, logs, and retention management
-- UI for creating backup policies and triggers
-
-### 🔐 Supabase Auth Integration
-- User sessions, role-based access control (planned)
-- Simple onboarding and management via JWT-based sessions
-
-### 🤖 AI-Driven Features (Planned)
-- **Anomaly Detection**: Predict and highlight backup failures
-- **Resource Selection**: Recommend backup priorities
-- **NLP Assistant**: Ask for backup actions in natural language
-- **Restore Path Optimization**: Smart restore strategies based on metrics
-
----
-
-## 🏗️ Architecture
-
-Kylon follows a unified full-stack TypeScript architecture:
-
-```mermaid
-graph TD
-    A["🧭 Next.js Frontend (React + SASS + Zustand)"] -->|tRPC| B["⚙️ Next.js Backend (API Routes + oRPC)"]
-    B -->|Securely Stores| C1["📂 Supabase DB (PostgreSQL)"]
-    B -->|Connects via Kubeconfig| C2["☸️ K8s Clusters"]
-    B -->|Uploads/Fetches Snapshots| D["🪣 Object Storage (AWS/GCP/Azure)"]
-    B -->|Inference Calls (Planned)| E["🧠 AI/ML Service (External/In-Pod)"]
-    E -->|Training Logs| F["📈 Backup Metrics / Failure History"]
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

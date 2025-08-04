@@ -21,7 +21,7 @@ const eduHand = Edu_NSW_ACT_Foundation({
 });
 
 export const metadata: Metadata = {
-    title: "Kylon:",
+    title: "Kylon",
     description:
         "Kylon is a robust backend application designed for distributed systems management, offering streamlined operations and enhanced control.",
     keywords: [
