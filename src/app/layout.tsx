@@ -4,6 +4,7 @@ import { ToastProvider } from "@/contexts";
 import "../styles/globals.scss";
 import type { Metadata } from "next";
 import { Manrope, Edu_NSW_ACT_Foundation } from "next/font/google";
+import { TrpcProvider } from "@/client/provider";
 
 const manrope = Manrope({
     subsets: ["latin"],
@@ -65,7 +66,9 @@ export default function RootLayout({
         <html lang="en" className={`${manrope.variable} ${eduHand.variable}`}>
             <body className="font-manrope">
                 <div className="main-content-wrapper">
-                    <ToastProvider>{children}</ToastProvider>
+                    <TrpcProvider>
+                        <ToastProvider>{children}</ToastProvider>
+                    </TrpcProvider>
                 </div>
             </body>
         </html>
