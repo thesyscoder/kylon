@@ -1,0 +1,59 @@
+// src/styles/globals.scss
+
+// 1. Abstracts (Variables, Mixins, Functions)
+@use "abstracts/variables" as v;
+@use "abstracts/mixins";
+@use "abstracts/functions";
+
+// 2. Base (Resets, Typography, Base Elements)
+@use "base/reset";
+@use "base/typography";
+@use "base/base";
+
+/* styles/globals.scss */
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: v.$color-background-light; // uses your design system variable
+    color: v.$color-text-dark; // ensures readable default text
+    line-height: 1.6;
+    // Ensure the body fills the viewport height, important for overall layout
+    min-height: 100vh;
+    background-color: v.$color-background-light;
+}
+
+.main-content-wrapper {
+    padding: v.$spacing-sm;
+
+    // Apply more padding for tablets and smaller laptops
+    @media (min-width: 768px) {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+
+    // Apply even more padding for most laptops
+    @media (min-width: 1024px) {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+
+    // THIS IS THE KEY BREAKPOINT FOR CENTERING ON LARGE SCREENS
+    // We want the content to be full-width on your MacBook, so this
+    // breakpoint must be HIGHER than your MacBook's effective width.
+    // Try 1920px as a starting point.
+    @media (min-width: 1920px) {
+        /* Changed from 1600px to 1920px */
+        max-width: 1440px; /* Increased max-width for centered content */
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 2rem; /* Keep some padding inside the centered container */
+        padding-right: 2rem;
+    }
+
+    // Optional: For extremely wide monitors (e.g., ultrawide),
+    // you might want an even larger max-width.
+    @media (min-width: 2560px) {
+        max-width: 1600px;
+    }
+}
